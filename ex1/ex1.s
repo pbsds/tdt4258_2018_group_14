@@ -109,24 +109,90 @@ _reset:
     ldr r1, =0xff                       //- enable pull-up on buttons
     str r1, [r0, GPIO_DOUT]
 
+    // set initial state
+    mov r7, #0b00000010                 //- the leds to show
+    mov r9, #0xff                       //- the previous button state
+    mov r10, #0                         //- do invert
 
 
 
-
-start:
+main:
     // read button states
     ldr r0, =GPIO_PC_BASE
-    ldr r8, [r0, GPIO_DIN] //- read button states
+    ldr r8, [r0, GPIO_DIN]              //- read button states
 
-    // write to LEDs
+    mvn r1, r9
+    mov r9, r8
+    orr r8, r1, r8
+
+    //do shifting
+    and r1, r8, #0x1
+    cbnz r1, main_2
+    bl shiftleft
+main_2:
+    and r1, r8, #0x4
+    cbnz r1, main_3
+    bl shiftright
+main_3:
+    and r1, r8, #0x2
+    cbnz r1, main_4
+    bl light
+main_4:
+    and r1, r8, #0x8
+    cbnz r1, main_5
+    bl lightnegate
+main_5:
 
     ldr r0, =GPIO_PA_BASE
-    lsl r1, r8, 8
-    //mvn r1, r1                        //- active low :^)
+    lsl r1, r7, 8
+
+    cmp r10, #1
+    beq main_6
+    mvn r1, r1
+main_6:
     str r1, [r0, GPIO_DOUT]
 
 
-    b start  // loop
+
+    b main                              //- loop
+
+shiftleft:
+    push {LR}
+    cmp r7, #0x01
+    beq shiftleft_end
+    lsr r7, r7, 1
+shiftleft_end:
+    pop {LR}                            //- return
+    mov PC, LR
+
+    .thumb_func
+shiftright:
+    push {LR}
+    cmp r7, #0x80
+    beq shiftright_end
+    lsl r7, r7, 1
+shiftright_end:
+    pop {LR}                            //- return
+    mov PC, LR
+
+    .thumb_func
+light:
+    push {LR}
+    mov r10, #1
+    pop {LR}                            //- return
+    mov PC, LR
+
+
+    .thumb_func
+lightnegate:
+    push {LR}
+    mov r10, #0
+    pop {LR}                            //- return
+    mov PC, LR
+
+
+data:
+    .word 0                             //- led position
 
   /////////////////////////////////////////////////////////////////////////////
   //

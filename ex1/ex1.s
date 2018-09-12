@@ -83,7 +83,7 @@
         .thumb_func
 _reset:
 
-    // setup GPIO
+    // setup GPIO clock
     ldr r0, =CMU_BASE
     ldr r1, [r0, CMU_HFPERCLKEN0]       //- load GPIO clock enable
 
@@ -93,7 +93,7 @@ _reset:
 
     str r1, [r0, CMU_HFPERCLKEN0]       //- write that change to MMIO register
 
-    // setup LEDS
+    // setup LEDS GPIO as writeable
     ldr r0, =GPIO_PA_BASE               //- set GPIO_CTRL write mode
     mov r2, #0x2
     str r2, [r0, GPIO_CTRL]
@@ -101,14 +101,28 @@ _reset:
     ldr r1, = 0x55555555                //- enable LEDs 8-15
     str r1, [r0, GPIO_MODEH]
 
+    // setup button GPIO as readable
+    ldr r0, =GPIO_PC_BASE               //- set GPIO_CTRL READ mode
+    ldr r1, =0x33333333                 //- enable BUTTONS 0-7 by writing HIGH to them
+    str r1, [r0, GPIO_MODEL]
+
+    ldr r1, =0xff                       //- enable pull-up on buttons
+    str r1, [r0, GPIO_DOUT]
+
+
+
+
+
 start:
     // read button states
+    ldr r0, =GPIO_PC_BASE
+    ldr r8, [r0, GPIO_DIN] //- read button states
 
     // write to LEDs
 
     ldr r0, =GPIO_PA_BASE
-    ldr r1, =1024                       //- (1<<(8+2))
-    mvn r1, r1                          //- active low :^)
+    lsl r1, r8, 8
+    //mvn r1, r1                        //- active low :^)
     str r1, [r0, GPIO_DOUT]
 
 

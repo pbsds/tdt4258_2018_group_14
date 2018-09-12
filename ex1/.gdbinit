@@ -6,3 +6,4 @@ set mem inaccessible-by-default off
 mon speed 4000
 mon endian little
 mon reset 0
+layout regs

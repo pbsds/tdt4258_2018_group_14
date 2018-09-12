@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+make &&
 make upload && (
 
 JLinkGDBServer >/dev/null &

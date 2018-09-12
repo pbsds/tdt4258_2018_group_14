@@ -82,7 +82,11 @@
         .type   _reset, %function
         .thumb_func
 _reset: 
-        b .  // do nothing
+        ldr r1, =3
+        ldr r2, =5
+        add r0, r1, r2
+        
+        b _reset  // do nothing
   
   /////////////////////////////////////////////////////////////////////////////
   //

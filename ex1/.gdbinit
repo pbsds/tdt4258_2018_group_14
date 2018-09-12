@@ -7,3 +7,7 @@ mon speed 4000
 mon endian little
 mon reset 0
 layout regs
+
+define hook-quit
+    set confirm off
+end

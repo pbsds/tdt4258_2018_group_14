@@ -82,7 +82,6 @@
         .type   _reset, %function
         .thumb_func
 _reset:
-
     // setup GPIO clock
     ldr r0, =CMU_BASE
     ldr r1, [r0, CMU_HFPERCLKEN0]       //- load GPIO clock enable
@@ -97,7 +96,7 @@ _reset:
     ldr r0, =GPIO_PA_BASE               //- set GPIO_CTRL write mode
     mov r2, #0x2
     str r2, [r0, GPIO_CTRL]
-
+	
     ldr r1, = 0x55555555                //- enable LEDs 8-15
     str r1, [r0, GPIO_MODEH]
 
@@ -112,21 +111,16 @@ _reset:
     // setup GPIO interrupt pins
     ldr r0, =GPIO_BASE
     ldr r1, =0x22222222
-    str r1, [r0, GPIO_EXTIPSELL]        //- set port c's pins 0-7 as interrupt generators
+    str r1, [r0, GPIO_EXTIPSELL]        //- set port cs pins 0-7 as interrupt generators
 
-    //ldr r1, =0xff
-    //str r1, [r0, GPIO_EXTIRISE]       //- generate interrupts on 0->1 transitions
+    ldr r1, =0xff
+    str r1, [r0, GPIO_EXTIRISE]         //- generate interrupts on 0->1 transitions
 
     ldr r1, =0xff
     str r1, [r0, GPIO_EXTIFALL]         //- generate interrupts on 1->0 transitions
 
     ldr r1, =0xff
     str r1, [r0, GPIO_IEN]              //- enable interrupts on pins 0-7
-
-    // enable interrupt handling
-    ldr r0, =ISER0
-    ldr r1, =0x802
-    str r1, [r0]
 
     // Setup sleep
     ldr r0, =SCR
@@ -136,17 +130,39 @@ _reset:
     // set initial state
     mov r7, #0b00000010                 //- the leds to show
     mov r10, #0                         //- do invert
+    ldr r0, =GPIO_PA_BASE               //- Load in entry point for LEDs
+    lsl r1, r7, 8                       //- Right shift the current light position
+    str r1, [r0, GPIO_DOUT]
 
-    b wait                                 //- sleep, theoretically
+    // clear interrupt flags
+    ldr r0, =GPIO_BASE
+    ldr r1, [r0, GPIO_IF]
+    str r1, [r0, GPIO_IFC]
+
+    // enable interrupt handling
+    ldr r0, =ISER0
+    ldr r1, =0x802
+    str r1, [r0]	
+
+    b dead                                 //- sleep, theoretically
 
 
 // The main loop
+	.thumb_func
 main:
+
+     // set initial state
+    mov r7, #0b11010101                 //- the leds to show
+    ldr r0, =GPIO_PA_BASE               //- Load in entry point for LEDs
+    lsl r1, r7, 8                       //- Right shift the current light position
+    str r1, [r0, GPIO_DOUT]
+    //b dead
+	
     // read interrupt states
     ldr r0, =GPIO_BASE
     ldr r8, [r0, GPIO_IF]              //- read button states
-
-    mvn r8, r8
+	
+    //mvn r8, r8
 
     //do shifting
     and r1, r8, #0x1                    //- check if button SW1 is pressed
@@ -178,7 +194,8 @@ main_6:
     ldr r1, [r0, GPIO_IF]
     str r1, [r0, GPIO_IFC]              //- Reset GPIO interrupt
 
-    b wait                              //- sleep until interrupt
+    wfi
+    //b dead                              //- sleep until interrupt
 
 
 
@@ -192,7 +209,7 @@ main_6:
 shiftleft:
     push {LR}
     cmp r7, #0x01                       //- Check if light already all to the left
-    beq shiftleft_end                   //- Skip if light can't be moved any more to the left
+    beq shiftleft_end                   //- Skip if light cant be moved any more to the left
     lsr r7, r7, 1                       //- Move light to the left
 shiftleft_end:
     pop {LR}                            //- return
@@ -202,7 +219,7 @@ shiftleft_end:
 shiftright:
     push {LR}
     cmp r7, #0x80                       //- Check if light already all to the right
-    beq shiftright_end                  //- Skip if light can't be moved any more to the right
+    beq shiftright_end                  //- Skip if light cant be moved any more to the right
     lsl r7, r7, 1                       //- Move light to the right
 shiftright_end:
     pop {LR}                            //- return
@@ -234,27 +251,30 @@ data:
   //
   /////////////////////////////////////////////////////////////////////////////
 
-        .thumb_func
+    .thumb_func
 gpio_handler:
-    b .       
+    b .
 
 
   /////////////////////////////////////////////////////////////////////////////
         .thumb_func
-wait:
+dead:
     wfi
     // Debug
-    ldr r0, =GPIO_BASE
-    ldr r1, [r0, GPIO_IF]
-    ldr r0, =ISER0
-    ldr r1, [r0]
-    ldr r0, =ISPR0
-    ldr r1, [r0]
-    ldr r0, =IABR0
-    ldr r1, [r0]
+    //ldr r0, =GPIO_BASE
+    //ldr r1, [r0, GPIO_IF]
+    //ldr r0, =ISER0
+    //ldr r1, [r0]
+    //ldr r0, =ISPR0
+    //ldr r1, [r0]
+    //ldr r0, =IABR0
+    //ldr r1, [r0]
     // Debug End
-    b wait
+    b dead
 
         .thumb_func
 dummy_handler:
         b .                             //- do nothing
+
+//dead:
+  //  b dead

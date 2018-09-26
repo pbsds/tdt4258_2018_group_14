@@ -142,6 +142,9 @@ _reset:
     str r1, [r0, #0x004]                //- store
     str r1, [r0, CMU_HFPERCLKDIV]       //- store
 
+    // use ACMPn to lower power used to drive the LEDs
+    // todo
+
     // set initial state
     mov r7, #0b00000010                 //- the leds to show
     mov r10, #0                         //- do_invert = False

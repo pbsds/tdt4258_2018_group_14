@@ -129,8 +129,8 @@ _reset:
 
     // Disable SRAM
     ldr r0, =EMU_BASE
-	mov r1, #0x4                        //- Disable SRAM blocks 1-3
-	//str r1, [r0, #0x004]                //- Write to EMU_MEMCTRL (doesn't work)
+	mov r1, #0x3                        //- Disable SRAM blocks 1 and 2, but not 3
+	str r1, [r0, #0x004]                //- Write to EMU_MEMCTRL
 
     // lower clock frequency
     ldr r0, =CMU_BASE

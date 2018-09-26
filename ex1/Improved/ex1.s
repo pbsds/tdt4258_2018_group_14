@@ -140,7 +140,7 @@ _reset:
     mul r1, r1, r3
     mul r2, r2, r3
     str r1, [r0, #0x004]                //- store
-    str r1, [r0, CMU_HFPERCLKDIV]       //- store
+    str r2, [r0, CMU_HFPERCLKDIV]       //- store
 
     // use ACMPn to lower power used to drive the LEDs
     // todo

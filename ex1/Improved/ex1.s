@@ -127,6 +127,11 @@ _reset:
     ldr r1, =0x6                        //- Enable deep sleep, and go into deep sleep when returning from interrupt
     str r1, [r0]
 
+    // Disable SRAM
+    ldr r0, =EMU_BASE
+	mov r1, #0x4                        //- Disable SRAM blocks 1-3
+	//str r1, [r0, #0x004]                //- Write to EMU_MEMCTRL (doesn't work)
+
     // set initial state
     mov r7, #0b00000010                 //- the leds to show
     mov r10, #0                         //- do_invert = False

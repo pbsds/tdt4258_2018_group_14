@@ -132,6 +132,16 @@ _reset:
 	mov r1, #0x4                        //- Disable SRAM blocks 1-3
 	//str r1, [r0, #0x004]                //- Write to EMU_MEMCTRL (doesn't work)
 
+    // lower clock frequency
+    ldr r0, =CMU_BASE
+    ldr r1, [r0, #0x004]                //- get current frequency divide factor of CMU_HFCORECLKDIV
+    ldr r2, [r0, CMU_HFPERCLKDIV]       //- get current frequency divide factor of CMU_HFPERCLKDIV
+    mov r3, #100                        //- make it hundred times higher!
+    mul r1, r1, r3
+    mul r2, r2, r3
+    str r1, [r0, #0x004]                //- store
+    str r1, [r0, CMU_HFPERCLKDIV]       //- store
+
     // set initial state
     mov r7, #0b00000010                 //- the leds to show
     mov r10, #0                         //- do_invert = False

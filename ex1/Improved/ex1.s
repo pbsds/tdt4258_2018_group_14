@@ -144,7 +144,8 @@ _reset:
     ldr r1, =0x802
     str r1, [r0]	
 
-    b dead                                 //- sleep, theoretically
+    wfi
+    b . //- safety for GDB
 
 
 // The main loop
@@ -160,7 +161,10 @@ main:
 	
     // read interrupt states
     ldr r0, =GPIO_BASE
-    ldr r8, [r0, GPIO_IF]              //- read button states
+    ldr r8, [r0, GPIO_IF]               //- read button states
+    str r8, [r0, GPIO_IFC]              //- clear GPIO interrupt
+
+    push {LR}
 	
     //mvn r8, r8
 
@@ -190,13 +194,9 @@ main_5:
 main_6:
     str r1, [r0, GPIO_DOUT]             //- Set the LEDs to the right state
 
-    ldr r0, =GPIO_BASE
-    ldr r1, [r0, GPIO_IF]
-    str r1, [r0, GPIO_IFC]              //- Reset GPIO interrupt
-
-    wfi                                 //- wait for interrupt
-    //b dead                              //- sleep until interrupt
-
+    pop {r0}
+    bx r0
+    wfi //- safety
 
 
 ////////////////////////////////////////////////////////////////////////////
@@ -253,8 +253,10 @@ data:
 
     .thumb_func
 gpio_handler:
-    b .
-
+    ldr r0, =GPIO_BASE
+    ldr r1, [r0, GPIO_IF]
+    str r1, [r0, GPIO_IFC]
+    bx lr
 
   /////////////////////////////////////////////////////////////////////////////
         .thumb_func

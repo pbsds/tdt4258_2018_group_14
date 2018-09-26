@@ -151,7 +151,7 @@ _reset:
 	.thumb_func
 main:
 
-     // set initial state
+    // set initial state
     mov r7, #0b11010101                 //- the leds to show
     ldr r0, =GPIO_PA_BASE               //- Load in entry point for LEDs
     lsl r1, r7, 8                       //- Right shift the current light position
@@ -194,7 +194,7 @@ main_6:
     ldr r1, [r0, GPIO_IF]
     str r1, [r0, GPIO_IFC]              //- Reset GPIO interrupt
 
-    wfi
+    wfi                                 //- wait for interrupt
     //b dead                              //- sleep until interrupt
 
 
@@ -212,8 +212,8 @@ shiftleft:
     beq shiftleft_end                   //- Skip if light cant be moved any more to the left
     lsr r7, r7, 1                       //- Move light to the left
 shiftleft_end:
-    pop {LR}                            //- return
-    mov PC, LR
+    pop {r0}                            //- return
+    bx r0
 
     .thumb_func
 shiftright:
@@ -222,23 +222,23 @@ shiftright:
     beq shiftright_end                  //- Skip if light cant be moved any more to the right
     lsl r7, r7, 1                       //- Move light to the right
 shiftright_end:
-    pop {LR}                            //- return
-    mov PC, LR
+    pop {r0}                            //- return
+    bx r0
 
     .thumb_func
 light:
     push {LR}
     mov r10, #1                         //- Set light to be positive
-    pop {LR}                            //- return
-    mov PC, LR
+    pop {r0}                            //- return
+    bx r0
 
 
     .thumb_func
 lightnegate:
     push {LR}
     mov r10, #0                         //- Set light to be negated
-    pop {LR}                            //- return
-    mov PC, LR
+    pop {r0}                            //- return
+    bx r0
 
 
 data:

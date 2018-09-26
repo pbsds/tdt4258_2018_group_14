@@ -113,11 +113,11 @@ _reset:
     ldr r1, =0x22222222
     str r1, [r0, GPIO_EXTIPSELL]        //- set port cs pins 0-7 as interrupt generators
 
-    ldr r1, =0xff
-    str r1, [r0, GPIO_EXTIRISE]         //- generate interrupts on 0->1 transitions
-
 //    ldr r1, =0xff
-//    str r1, [r0, GPIO_EXTIFALL]         //- generate interrupts on 1->0 transitions
+//    str r1, [r0, GPIO_EXTIRISE]           //- generate interrupts on 0->1 transitions
+
+    ldr r1, =0xff
+    str r1, [r0, GPIO_EXTIFALL]         //- generate interrupts on 1->0 transitions
 
     ldr r1, =0xff
     str r1, [r0, GPIO_IEN]              //- enable interrupts on pins 0-7

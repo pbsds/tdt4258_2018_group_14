@@ -116,8 +116,8 @@ _reset:
     ldr r1, =0xff
     str r1, [r0, GPIO_EXTIRISE]         //- generate interrupts on 0->1 transitions
 
-    ldr r1, =0xff
-    str r1, [r0, GPIO_EXTIFALL]         //- generate interrupts on 1->0 transitions
+//    ldr r1, =0xff
+//    str r1, [r0, GPIO_EXTIFALL]         //- generate interrupts on 1->0 transitions
 
     ldr r1, =0xff
     str r1, [r0, GPIO_IEN]              //- enable interrupts on pins 0-7
@@ -129,7 +129,7 @@ _reset:
 
     // set initial state
     mov r7, #0b00000010                 //- the leds to show
-    mov r10, #0                         //- do invert
+    mov r10, #0                         //- do_invert = False
     ldr r0, =GPIO_PA_BASE               //- Load in entry point for LEDs
     lsl r1, r7, 8                       //- Right shift the current light position
     str r1, [r0, GPIO_DOUT]
@@ -143,22 +143,15 @@ _reset:
     ldr r0, =ISER0
     ldr r1, =0x802
     str r1, [r0]	
-
+    
     wfi
     b . //- safety for GDB
 
 
-// The main loop
+// The main loop iteration
 	.thumb_func
 main:
 
-    // set initial state
-    mov r7, #0b11010101                 //- the leds to show
-    ldr r0, =GPIO_PA_BASE               //- Load in entry point for LEDs
-    lsl r1, r7, 8                       //- Right shift the current light position
-    str r1, [r0, GPIO_DOUT]
-    //b dead
-	
     // read interrupt states
     ldr r0, =GPIO_BASE
     ldr r8, [r0, GPIO_IF]               //- read button states
@@ -168,16 +161,18 @@ main:
 	
     //mvn r8, r8
 
+switch:
+
     //do shifting
     and r1, r8, #0x1                    //- check if button SW1 is pressed
     cbnz r1, main_2                     //- skip shiftleft if not pressed
-    bl shiftleft
-main_2:
-    and r1, r8, #0x4                    //- check if button SW2 is pressed
-    cbnz r1, main_3                     //- skip shiftright if not pressed
     bl shiftright
+main_2:
+    and r1, r8, #0x4                    //- check if button SW3 is pressed
+    cbnz r1, main_3                     //- skip shiftright if not pressed
+    bl shiftleft
 main_3:
-    and r1, r8, #0x2                    //- check if button SW3 is pressed
+    and r1, r8, #0x2                    //- check if button SW2 is pressed
     cbnz r1, main_4                     //- skip light if not pressed
     bl light
 main_4:
@@ -241,9 +236,6 @@ lightnegate:
     bx r0
 
 
-data:
-    .word 0                             //- derp
-
   /////////////////////////////////////////////////////////////////////////////
   //
   // GPIO handler
@@ -277,6 +269,3 @@ dead:
         .thumb_func
 dummy_handler:
         b .                             //- do nothing
-
-//dead:
-  //  b dead

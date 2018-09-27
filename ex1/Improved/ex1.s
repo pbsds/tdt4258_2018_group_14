@@ -92,11 +92,7 @@ _reset:
 
     str r1, [r0, CMU_HFPERCLKEN0]       //- write that change to MMIO register
 
-    // setup LEDS GPIO as writeable
-    ldr r0, =GPIO_PA_BASE               //- set GPIO_CTRL write mode
-    mov r2, #0x2
-    str r2, [r0, GPIO_CTRL]
-	
+    ldr r0, =GPIO_PA_BASE              	
     ldr r1, = 0x55555555                //- enable LEDs 8-15
     str r1, [r0, GPIO_MODEH]
 
@@ -130,7 +126,7 @@ _reset:
     // Disable SRAM
     ldr r0, =EMU_BASE
     mov r1, #0x3                        //- Disable SRAM blocks 1 and 2, but not 3
-    str r1, [r0, #0x004]                //- Write to EMU_MEMCTRL
+    str r1, [r0, #0x004]                //- Write to EMU_MEMCTL
 
     // lower clock frequency
     ldr r0, =CMU_BASE
@@ -149,7 +145,7 @@ _reset:
 
     // set initial state
     mov r7, #0b00000010                 //- the leds to show
-    mov r10, #0                         //- do_invert = False
+    mov r5, #0                         //- do_invert = False
     ldr r0, =GPIO_PA_BASE               //- Load in entry point for LEDs
     lsl r1, r7, 8                       //- Right shift the current light position
     str r1, [r0, GPIO_DOUT]
@@ -163,54 +159,48 @@ _reset:
     ldr r0, =ISER0
     ldr r1, =0x802
     str r1, [r0]	
-    
+
     wfi
     b . //- safety for GDB
 
 
 // The main loop iteration
-	.thumb_func
+    .thumb_func
 main:
 
     // read interrupt states
     ldr r0, =GPIO_BASE
     ldr r8, [r0, GPIO_IF]               //- read button states
-    str r8, [r0, GPIO_IFC]              //- clear GPIO interrupt
-
-    push {LR}
+    str r8, [r0, GPIO_IFC]              //- clear GPIO interrupts
 	
-    //mvn r8, r8
-
 switch:
-
     //do shifting
     and r1, r8, #0x1                    //- check if button SW1 is pressed
     cbnz r1, main_2                     //- skip shiftleft if not pressed
-    bl shiftright
+    b shiftright
 main_2:
     and r1, r8, #0x4                    //- check if button SW3 is pressed
     cbnz r1, main_3                     //- skip shiftright if not pressed
-    bl shiftleft
+    b shiftleft
 main_3:
     and r1, r8, #0x2                    //- check if button SW2 is pressed
     cbnz r1, main_4                     //- skip light if not pressed
-    bl light
+    mov r5, #1                         //- Set light to be positive
 main_4:
     and r1, r8, #0x8                    //- check if button SW4 is pressed
     cbnz r1, main_5                     //- skip lightnegate if not pressed
-    bl lightnegate
+    mov r5, #0                         //- Set light to be negated
 main_5:
     ldr r0, =GPIO_PA_BASE               //- Load in entry point for LEDs
-    lsl r1, r7, 8                       //- Right shift the current light position
+    mov r1, r7
 
-    cmp r10, #1                         //- Check if you should negate the light
+    cmp r5, #1                         //- Check if you should negate the light
     beq main_6                          //- Skip if you are not supposed to negate
     mvn r1, r1                          //- Negate the bits, inverting the light
 main_6:
+    lsl r1, r1, #8                       //- Right shift the current light position
     str r1, [r0, GPIO_DOUT]             //- Set the LEDs to the right state
-
-    pop {r0}
-    bx r0
+    bx lr
     wfi //- safety
 
 
@@ -220,41 +210,21 @@ main_6:
 //
 ////////////////////////////////////////////////////////////////////////////
 
-
+    .thumb_func
 shiftleft:
-    push {LR}
     cmp r7, #0x01                       //- Check if light already all to the left
     beq shiftleft_end                   //- Skip if light cant be moved any more to the left
     lsr r7, r7, 1                       //- Move light to the left
 shiftleft_end:
-    pop {r0}                            //- return
-    bx r0
-
+    b main_3
+	
     .thumb_func
 shiftright:
-    push {LR}
     cmp r7, #0x80                       //- Check if light already all to the right
     beq shiftright_end                  //- Skip if light cant be moved any more to the right
     lsl r7, r7, 1                       //- Move light to the right
 shiftright_end:
-    pop {r0}                            //- return
-    bx r0
-
-    .thumb_func
-light:
-    push {LR}
-    mov r10, #1                         //- Set light to be positive
-    pop {r0}                            //- return
-    bx r0
-
-
-    .thumb_func
-lightnegate:
-    push {LR}
-    mov r10, #0                         //- Set light to be negated
-    pop {r0}                            //- return
-    bx r0
-
+    b main_2
 
   /////////////////////////////////////////////////////////////////////////////
   //

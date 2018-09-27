@@ -129,8 +129,8 @@ _reset:
 
     // Disable SRAM
     ldr r0, =EMU_BASE
-	mov r1, #0x3                        //- Disable SRAM blocks 1 and 2, but not 3
-	str r1, [r0, #0x004]                //- Write to EMU_MEMCTRL
+    mov r1, #0x3                        //- Disable SRAM blocks 1 and 2, but not 3
+    str r1, [r0, #0x004]                //- Write to EMU_MEMCTRL
 
     // lower clock frequency
     ldr r0, =CMU_BASE
@@ -142,8 +142,10 @@ _reset:
     str r1, [r0, #0x004]                //- store
     str r2, [r0, CMU_HFPERCLKDIV]       //- store
 
-    // use ACMPn to lower power used to drive the LEDs
-    // todo
+    // lower drive current to LEDs
+    ldr r0, =GPIO_PA_BASE
+    mov r1, #1                          //- set drivemode to LOWEST
+    str r1, [r0, GPIO_CTRL]             //- store this in GPIO_PA_CTRL
 
     // set initial state
     mov r7, #0b00000010                 //- the leds to show

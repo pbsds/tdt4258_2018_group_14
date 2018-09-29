@@ -172,7 +172,9 @@ main:
     ldr r0, =GPIO_BASE
     ldr r8, [r0, GPIO_IF]               //- read button states
     str r8, [r0, GPIO_IFC]              //- clear GPIO interrupts
-	
+    mvn r8, r8
+
+
 switch:
     //do shifting
     and r1, r8, #0x1                    //- check if button SW1 is pressed

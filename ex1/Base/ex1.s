@@ -95,7 +95,7 @@ _reset:
 
     // setup LEDS GPIO as writeable
     ldr r0, =GPIO_PA_BASE               //- set GPIO_CTRL write mode
-    mov r2, #0x2
+    mov r2, #0x2                        //- HIGH drive current
     str r2, [r0, GPIO_CTRL]
 
     ldr r1, = 0x55555555                //- enable LEDs 8-15

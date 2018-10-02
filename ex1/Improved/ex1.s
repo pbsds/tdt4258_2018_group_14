@@ -92,6 +92,7 @@ _reset:
 
     str r1, [r0, CMU_HFPERCLKEN0]       //- write that change to MMIO register
 
+    // setup LEDS GPIO as writeable
     ldr r0, =GPIO_PA_BASE
     ldr r1, = 0x55555555                //- enable LEDs 8-15
     str r1, [r0, GPIO_MODEH]
@@ -130,15 +131,15 @@ _reset:
 
     // lower clock frequency
     ldr r0, =CMU_BASE
-    ldr r1, [r0, #0x004]                //- get current frequency divide factor of CMU_HFCORECLKDIV
-    ldr r2, [r0, CMU_HFPERCLKDIV]       //- get current frequency divide factor of CMU_HFPERCLKDIV
+    ldr r1, [r0, #0x004]                //- get current high frequency clock divide factor of CMU_HFCORECLKDIV
+    ldr r2, [r0, CMU_HFPERCLKDIV]       //- get current high frequency clock divide factor of CMU_HFPERCLKDIV
     mov r3, #100                        //- make it hundred times higher!
     mul r1, r1, r3
     mul r2, r2, r3
     str r1, [r0, #0x004]                //- store
     str r2, [r0, CMU_HFPERCLKDIV]       //- store
 
-    // lower drive current to LEDs
+    // lower drive current to the LEDs
     ldr r0, =GPIO_PA_BASE
     mov r1, #0                          //- set drivemode to LOWEST
     str r1, [r0, GPIO_CTRL]             //- store this in GPIO_PA_CTRL
@@ -255,7 +256,7 @@ gpio_handler:
         .thumb_func
 dead:
     wfi
-    // Debug
+    // Debug with GDB, reading values<
     //ldr r0, =GPIO_BASE
     //ldr r1, [r0, GPIO_IF]
     //ldr r0, =ISER0

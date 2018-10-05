@@ -19,6 +19,7 @@
  */
 void setupTimer(uint32_t period);
 void setupDAC();
+void setupGPIO();
 void setupNVIC();
 
 /*

@@ -21,10 +21,10 @@ void setupNVIC();
 /*
  * sound
  */
-void set_song(const uint32_t(*)[2]);
-bool step_song();
-uint32_t get_next_song_timestamp(const uint32_t song[][2], unsigned int index);
-uint32_t get_song_note(const uint32_t song[][2], unsigned int index);
+void setSong(const uint32_t(*)[2]);
+bool stepSong();
+uint32_t getNextSongTimestamp(const uint32_t song[][2], unsigned int index);
+uint32_t getSongNote(const uint32_t song[][2], unsigned int index);
 
 
 /*

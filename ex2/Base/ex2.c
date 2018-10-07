@@ -40,7 +40,7 @@ int main(void)
 	 * TODO for higher energy efficiency, sleep while waiting for
 	 * interrupts instead of infinite loop for busy-waiting 
 	 */
-	set_song(DOGSONG);
+	setSong(DOGSONG);
 	startTimer();
 
 	uint32_t counter = 0;
@@ -52,7 +52,7 @@ int main(void)
 		while (*TIMER1_CNT>=15) ;
 		counter++;
 
-		step_song();
+		stepSong();
 
 	    if (counter>=44100) {
 	        *GPIO_PA_DOUT ^= 0xff00;

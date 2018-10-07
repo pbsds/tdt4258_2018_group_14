@@ -18,6 +18,14 @@ void setupDAC();
 void disableDAC();
 void setupNVIC();
 
+/*
+ * sound
+ */
+void set_song(const uint32_t(*)[2]);
+bool step_song();
+uint32_t get_next_song_timestamp(const uint32_t song[][2], unsigned int index);
+uint32_t get_song_note(const uint32_t song[][2], unsigned int index);
+
 
 /*
  * timer

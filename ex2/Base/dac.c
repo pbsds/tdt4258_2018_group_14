@@ -15,4 +15,25 @@ void setupDAC()
 	 * data registers, DAC0_CH0DATA and DAC0_CH1DATA, for example from a
 	 * timer interrupt 
 	 */
+     
+    // enable DAC clock
+    *CMU_HFPERCLKEN0 |= CMU2_HFPERCLKEN0_DAC0;
+    
+    // Prescale the DAC clock
+    *DAC0_CTRL = 0x50010;
+    
+    // enable sine mode
+    //*DAC0_CTRL |= 0x4; 
+    
+    // enable left and right channel
+    *DAC0_CH1CTRL = 1; 
+    *DAC0_CH0CTRL = 1; 
+}
+
+void disableDAC() {
+    // reverse of setup, nulling everything
+    *CMU_HFPERCLKEN0 &= ~CMU2_HFPERCLKEN0_DAC0;
+    *DAC0_CTRL = 0;
+    *DAC0_CH0CTRL = 0;
+    *DAC0_CH1CTRL = 0;
 }

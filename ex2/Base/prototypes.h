@@ -15,6 +15,7 @@ uint32_t random();
  * Declaration of peripheral setup functions 
  */
 void setupDAC();
+void disableDAC();
 void setupNVIC();
 
 

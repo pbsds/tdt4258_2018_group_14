@@ -6,7 +6,7 @@ make upload && (
 JLinkGDBServer >/dev/null &
 server_pid=$!
 
-arm-none-eabi-gdb -x .gdbinit ex1.elf
+arm-none-eabi-gdb -x .gdbinit ex2.elf
 
 kill $server_pid
 )

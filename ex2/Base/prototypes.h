@@ -17,6 +17,15 @@ uint32_t random();
 void setupDAC();
 void setupNVIC();
 
+
+/*
+ * timer
+ */
+void setupTimer(uint32_t period);
+void startTimer();
+void stopTimer();
+
+
 /* 
  * GPIO
  */

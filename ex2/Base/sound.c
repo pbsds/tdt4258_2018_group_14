@@ -44,7 +44,27 @@ bool step_song()
     if (++sample_counter>=44100) { //maybe not reset this each second?
         sample_counter = 0;
     }
-
+    
+    
+    uint32_t freq = get_song_note(player_song, player_song_index);
+    
+    // check if next note is to be played
+    if (get_next_song_timestamp(player_song, player_song_index) <= player_mstime) {
+        uint32_t next = get_song_note(player_song, player_song_index+1);
+        
+        if (freq == 0 && next == 0) return false;
+        
+        player_song_index++; //goto next note
+        freq = next;
+    }
+    
+    // play note
+    if (freq != 0) {
+        uint16_t sample = sawtooth(sample_counter, freq, AMPLITUDE);
+        *DAC0_CH1DATA = sample;
+        *DAC0_CH0DATA = sample;
+    }
+    
     return true;
 }
  

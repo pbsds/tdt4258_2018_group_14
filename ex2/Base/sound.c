@@ -10,6 +10,8 @@
 /*
  * Functions to generate waveform samples
  * Counter is a value incremented at samplerate speed
+ * These are currently the main computation draw, due to the divide
+ * A possible solution might be a lookup table or something
  */
 uint16_t sawtooth(uint16_t counter, uint32_t freq, uint16_t amplitude)
 {
@@ -17,7 +19,7 @@ uint16_t sawtooth(uint16_t counter, uint32_t freq, uint16_t amplitude)
 }
 uint16_t squarewave(uint16_t counter, uint32_t freq, uint16_t amplitude)
 {
-    return (freq*counter*2/SAMPLE_RATE)%2 * amplitude;
+    return ((freq*counter*2/SAMPLE_RATE)%2) ? amplitude : 0;
 }
 
 
@@ -45,8 +47,9 @@ void setWaveform(uint16_t (*wavepoint_f)(uint16_t, uint32_t, uint16_t))
 {
     player_waveform = wavepoint_f;
 }
+// call this each sample, returns true while playing
 bool stepSong()
-{ // call this each sample, returns true while playing
+{
     // advance time
     if (++ms_counter>=44) {
         player_mstime++;

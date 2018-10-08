@@ -22,9 +22,13 @@ void setupNVIC();
  * sound
  */
 void setSong(const uint32_t(*)[2]);
+void setWaveform(uint16_t (*wavepoint_f)(uint16_t, uint32_t, uint16_t));
 bool stepSong();
 uint32_t getNextSongTimestamp(const uint32_t song[][2], unsigned int index);
 uint32_t getSongNote(const uint32_t song[][2], unsigned int index);
+
+uint16_t sawtooth(uint16_t counter, uint32_t freq, uint16_t amplitude);
+uint16_t squarewave(uint16_t counter, uint32_t freq, uint16_t amplitude);
 
 
 /*

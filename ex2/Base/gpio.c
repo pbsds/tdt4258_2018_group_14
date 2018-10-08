@@ -2,6 +2,8 @@
 #include <stdbool.h>
 
 #include "efm32gg.h"
+#include "prototypes.h"
+#include "songs.h"
 
 /*
  * function to set up GPIO mode and interrupts
@@ -23,5 +25,42 @@ void setupGPIO()
 
 void handleButtons(uint32_t DIN)
 {
-	*GPIO_PA_DOUT = DIN<<8;
+	DIN = ~DIN;
+
+	// debug:
+	*GPIO_PA_DOUT = ~DIN<<8;
+
+	bool sw1 = (DIN & (0x1<<0)); // left
+	bool sw2 = (DIN & (0x1<<1)); // up
+	bool sw3 = (DIN & (0x1<<2)); // right
+	bool sw4 = (DIN & (0x1<<3)); // down
+	bool sw5 = (DIN & (0x1<<4)); // y
+	bool sw6 = (DIN & (0x1<<5)); // x
+	bool sw7 = (DIN & (0x1<<6)); // a
+	bool sw8 = (DIN & (0x1<<7)); // b
+
+	if (sw1) { // left
+		setSong(DOGSONG);
+	}
+	if (sw2) { // up
+		setSong(MT_PYRE);
+	}
+	if (sw3) { // right
+		setSong(SPIDER_DANCE);
+	}
+	if (sw4) { // down
+		setSong(CIRCUSGALOP);
+	}
+	if (sw5) { // y
+		setWaveform(sawtooth);
+	}
+	if (sw6) { // x
+		setWaveform(squarewave);
+	}
+	if (sw7) { // a
+		startTimer();
+	}
+	if (sw8) { // b
+		stopTimer();
+	}
 }

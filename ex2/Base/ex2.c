@@ -6,21 +6,10 @@
 #include "prototypes.h"
 
 /*
- * TODO calculate the appropriate sample period for the sound wave(s) you 
- * want to generate. The core clock (which the timer clock is derived
- * from) runs at 14 MHz by default. Also remember that the timer counter
- * registers are 16 bits. 
- */
-/*
  * The period between sound samples, in clock cycles 
  */
 #define   SAMPLE_PERIOD   317 // 14Mhz/317 = ~44.1khz
-//#define   SAMPLE_PERIOD   7000000 // 2hz
 
-
-/*
- * Your code will start executing here 
- */
 int main(void)
 {
 
@@ -43,21 +32,21 @@ int main(void)
 	setSong(DOGSONG);
 	startTimer();
 
-	uint32_t counter = 0;
+	uint32_t DIN;
 	while (1) {
 		/*
 		 * busy-wait for timer overflow with a generous window,
 		 * seems like the cpu is slow as heck or something
 		 */
-		while (*TIMER1_CNT>=15) ;
-		counter++;
+		while (*TIMER1_CNT>=30) {
+
+			// trigger only when something is pressed
+			DIN = *GPIO_PC_DIN;
+			if ((~DIN)&0xFF)
+				handleButtons(DIN);
+		};
 
 		stepSong();
-
-	    if (counter>=44100) {
-	        *GPIO_PA_DOUT ^= 0xff00;
-			counter = 0;
-	    }
 	};
 
 	return 0;

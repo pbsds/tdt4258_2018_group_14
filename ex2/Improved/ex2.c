@@ -25,61 +25,38 @@ int main(void)
 	 */
 	setupNVIC();
 
-	/*
-	 * TODO for higher energy efficiency, sleep while waiting for
-	 * interrupts instead of infinite loop for busy-waiting
-	 */
 	//initial state
 	setSong(DOGSONG);
 	startTimer();
 
-	uint32_t DIN;
-	while (1) {
-		/*
-		 * busy-wait for timer overflow with a generous window,
-		 * seems like the cpu is slow as heck or something
-		 */
-		while (*TIMER1_CNT>=30) {
-
-			// trigger only when something is pressed
-			DIN = *GPIO_PC_DIN;
-			if ((~DIN)&0xFF)
-				handleButtons(DIN);
-		};
-
-		stepSong();
-	};
-
+	__asm__("wfi");
+	while (1); // GBD safety
 	return 0;
 }
 
 void setupNVIC()
 {
-	/*
-	 * TODO use the NVIC ISERx registers to enable handling of
-	 * interrupt(s) remember two things are necessary for interrupt
-	 * handling: - the peripheral must generate an interrupt signal - the
-	 * NVIC must be configured to make the CPU handle the signal You will
-	 * need TIMER1, GPIO odd and GPIO even interrupt handling for this
-	 * assignment.
-	 */
-}
+	*SCR            |= 0x2;        // Enable SLEEP ON EXIT
+	//*SCR            |= 0x4;        // Enable DEEPSLEEP
+	// ^ DEEPSLEEP disables the SysTick timer, which cuases TIMER1 to not work
 
-/*
- * if other interrupt handlers are needed, use the following names:
- * NMI_Handler HardFault_Handler MemManage_Handler BusFault_Handler
- * UsageFault_Handler Reserved7_Handler Reserved8_Handler
- * Reserved9_Handler Reserved10_Handler SVC_Handler DebugMon_Handler
- * Reserved13_Handler PendSV_Handler SysTick_Handler DMA_IRQHandler
- * GPIO_EVEN_IRQHandler TIMER0_IRQHandler USART0_RX_IRQHandler
- * USART0_TX_IRQHandler USB_IRQHandler ACMP0_IRQHandler ADC0_IRQHandler
- * DAC0_IRQHandler I2C0_IRQHandler I2C1_IRQHandler GPIO_ODD_IRQHandler
- * TIMER1_IRQHandler TIMER2_IRQHandler TIMER3_IRQHandler
- * USART1_RX_IRQHandler USART1_TX_IRQHandler LESENSE_IRQHandler
- * USART2_RX_IRQHandler USART2_TX_IRQHandler UART0_RX_IRQHandler
- * UART0_TX_IRQHandler UART1_RX_IRQHandler UART1_TX_IRQHandler
- * LEUART0_IRQHandler LEUART1_IRQHandler LETIMER0_IRQHandler
- * PCNT0_IRQHandler PCNT1_IRQHandler PCNT2_IRQHandler RTC_IRQHandler
- * BURTC_IRQHandler CMU_IRQHandler VCMP_IRQHandler LCD_IRQHandler
- * MSC_IRQHandler AES_IRQHandler EBI_IRQHandler EMU_IRQHandler
- */
+	// general improvements:
+	//*CMU_HFPERCLKDIV *= 100;      // increase high frequency clock divide factor
+	*EMU_MEMCTL     = 0x3;        // Disable SRAM blocks 1 and 2, but not 3
+
+	// enable interrupts generators
+	*TIMER1_IEN     = 1;          // enable TIMER1 interrupt generation
+	*GPIO_EXTIPSELL = 0x22222222; // set port C pin 0-7 as interrupt generators
+	//*GPIO_EXTIRISE  = 0xff;       // generate interrupts on 0->1 transitions
+	*GPIO_EXTIFALL  = 0xff;       // generate interrupts on 1->0 transitions
+	*GPIO_IEN       = 0xff;       // enable interrupt generation on port 0-7
+
+	// enable interrupt handlers:
+	*ISER0 |= 0x1<<12; // TIMER1
+	*ISER0 |= 0x1<<11; // GPIO_ODD
+	*ISER0 |= 0x1<< 1; // GPIO_EVEN
+
+	// clear interrupt flags
+	*TIMER1_IFC = 1;
+	*GPIO_IFC = *GPIO_IF;
+}

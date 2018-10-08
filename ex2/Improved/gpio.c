@@ -13,13 +13,14 @@ void setupGPIO()
 	*CMU_HFPERCLKEN0 |= CMU2_HFPERCLKEN0_GPIO;	/* enable GPIO clock */
 
 	// LEDs
-	*GPIO_PA_CTRL = 2;	/* set high drive current */
-	*GPIO_PA_MODEH = 0x55555555;	/* set pins A8-15 as output */
-	*GPIO_PA_DOUT = 0xff00;	/* turn off LEDs D4-D8 (note: active low) */
+	//*GPIO_PA_CTRL = 0;           /* set LOWEST drive current */
+	*GPIO_PA_CTRL = 2;           /* set HIGH drive current */
+	*GPIO_PA_MODEH = 0x55555555; /* set pins A8-15 as output */
+	*GPIO_PA_DOUT = 0xff00;      /* turn off LEDs D4-D8 (note: active low) */
 
 	// Buttons
 	*GPIO_PC_MODEL = 0x33333333; /* READ mode for 0-7 */
-	*GPIO_PC_DOUT = 0x00ff; /* pull high */
+	*GPIO_PC_DOUT = 0x00ff;      /* pull high */
 
 }
 

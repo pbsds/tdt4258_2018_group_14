@@ -1,0 +1,20 @@
+digraph finite_state_machine {
+	rankdir=LR;
+	node [shape = doublecircle];
+	init;
+	node [shape = circle];
+	node [shape = ellipse];
+	wfi;
+	stepSong;
+	handleButton;
+	
+	init -> wfi [label = "do setup"];
+	
+	wfi -> handleButton [label = "GPIO_ODD"];
+	wfi -> handleButton [label = "GPIO_EVEN"];
+	wfi -> stepSong [label = "TIMER1"];
+	
+	edge [color="#888888", fontcolor="#555555"]
+	handleButton -> wfi [label="reset interrupt"];
+	stepSong -> wfi [label="reset interrupt"];
+}

@@ -1,0 +1,202 @@
+digraph finite_state_machine {
+	rankdir=LR;
+	node [shape = doublecircle];
+	init;
+    
+    node [shape = ellipse, style=filled];
+    node [fillcolor="#ddddff"];
+    song1_square_timer_on;
+    song2_square_timer_on;
+    song3_square_timer_on;
+    song4_square_timer_on;
+    node [fillcolor="#ffdddd"];
+    song1_sawtooth_timer_on;
+    song2_sawtooth_timer_on;
+    song3_sawtooth_timer_on;
+    song4_sawtooth_timer_on;
+    node [fillcolor="#aaaaff"];
+    song1_square_timer_off;
+    song2_square_timer_off;
+    song3_square_timer_off;
+    song4_square_timer_off;
+    node [fillcolor="#ffaaaa"];
+    song1_sawtooth_timer_off;
+    song2_sawtooth_timer_off;
+    song3_sawtooth_timer_off;
+    song4_sawtooth_timer_off;
+    
+    {
+        rank=same;
+        song1_square_timer_on;
+        song2_square_timer_on;
+        song3_square_timer_on;
+        song4_square_timer_on;
+    }
+    {
+        rank=same;
+        song1_sawtooth_timer_on;
+        song2_sawtooth_timer_on;
+        song3_sawtooth_timer_on;
+        song4_sawtooth_timer_on;
+    }
+    {
+        rank=same;
+        song1_square_timer_off;
+        song2_square_timer_off;
+        song3_square_timer_off;
+        song4_square_timer_off;
+    }
+    {
+        rank=same;
+        song1_sawtooth_timer_off;
+        song2_sawtooth_timer_off;
+        song3_sawtooth_timer_off;
+        song4_sawtooth_timer_off;
+    }
+    
+    
+    init -> song1_square_timer_on;
+    
+    // SW1, SW2, SW3, SW4
+    edge [color=blue]
+    song1_square_timer_on -> song1_square_timer_on [label= "SW1"];
+    song1_square_timer_off -> song1_square_timer_off [label= "SW1"];
+    song1_sawtooth_timer_on -> song1_sawtooth_timer_on [label= "SW1"];
+    song1_sawtooth_timer_off -> song1_sawtooth_timer_off [label= "SW1"];
+    song1_square_timer_on -> song2_square_timer_on [label= "SW2"];
+    song1_square_timer_off -> song2_square_timer_off [label= "SW2"];
+    song1_sawtooth_timer_on -> song2_sawtooth_timer_on [label= "SW2"];
+    song1_sawtooth_timer_off -> song2_sawtooth_timer_off [label= "SW2"];
+    song1_square_timer_on -> song3_square_timer_on [label= "SW3"];
+    song1_square_timer_off -> song3_square_timer_off [label= "SW3"];
+    song1_sawtooth_timer_on -> song3_sawtooth_timer_on [label= "SW3"];
+    song1_sawtooth_timer_off -> song3_sawtooth_timer_off [label= "SW3"];
+    song1_square_timer_on -> song4_square_timer_on [label= "SW4"];
+    song1_square_timer_off -> song4_square_timer_off [label= "SW4"];
+    song1_sawtooth_timer_on -> song4_sawtooth_timer_on [label= "SW4"];
+    song1_sawtooth_timer_off -> song4_sawtooth_timer_off [label= "SW4"];
+    song2_square_timer_on -> song1_square_timer_on [label= "SW1"];
+    song2_square_timer_off -> song1_square_timer_off [label= "SW1"];
+    song2_sawtooth_timer_on -> song1_sawtooth_timer_on [label= "SW1"];
+    song2_sawtooth_timer_off -> song1_sawtooth_timer_off [label= "SW1"];
+    song2_square_timer_on -> song2_square_timer_on [label= "SW2"];
+    song2_square_timer_off -> song2_square_timer_off [label= "SW2"];
+    song2_sawtooth_timer_on -> song2_sawtooth_timer_on [label= "SW2"];
+    song2_sawtooth_timer_off -> song2_sawtooth_timer_off [label= "SW2"];
+    song2_square_timer_on -> song3_square_timer_on [label= "SW3"];
+    song2_square_timer_off -> song3_square_timer_off [label= "SW3"];
+    song2_sawtooth_timer_on -> song3_sawtooth_timer_on [label= "SW3"];
+    song2_sawtooth_timer_off -> song3_sawtooth_timer_off [label= "SW3"];
+    song2_square_timer_on -> song4_square_timer_on [label= "SW4"];
+    song2_square_timer_off -> song4_square_timer_off [label= "SW4"];
+    song2_sawtooth_timer_on -> song4_sawtooth_timer_on [label= "SW4"];
+    song2_sawtooth_timer_off -> song4_sawtooth_timer_off [label= "SW4"];
+    song3_square_timer_on -> song1_square_timer_on [label= "SW1"];
+    song3_square_timer_off -> song1_square_timer_off [label= "SW1"];
+    song3_sawtooth_timer_on -> song1_sawtooth_timer_on [label= "SW1"];
+    song3_sawtooth_timer_off -> song1_sawtooth_timer_off [label= "SW1"];
+    song3_square_timer_on -> song2_square_timer_on [label= "SW2"];
+    song3_square_timer_off -> song2_square_timer_off [label= "SW2"];
+    song3_sawtooth_timer_on -> song2_sawtooth_timer_on [label= "SW2"];
+    song3_sawtooth_timer_off -> song2_sawtooth_timer_off [label= "SW2"];
+    song3_square_timer_on -> song3_square_timer_on [label= "SW3"];
+    song3_square_timer_off -> song3_square_timer_off [label= "SW3"];
+    song3_sawtooth_timer_on -> song3_sawtooth_timer_on [label= "SW3"];
+    song3_sawtooth_timer_off -> song3_sawtooth_timer_off [label= "SW3"];
+    song3_square_timer_on -> song4_square_timer_on [label= "SW4"];
+    song3_square_timer_off -> song4_square_timer_off [label= "SW4"];
+    song3_sawtooth_timer_on -> song4_sawtooth_timer_on [label= "SW4"];
+    song3_sawtooth_timer_off -> song4_sawtooth_timer_off [label= "SW4"];
+    song4_square_timer_on -> song1_square_timer_on [label= "SW1"];
+    song4_square_timer_off -> song1_square_timer_off [label= "SW1"];
+    song4_sawtooth_timer_on -> song1_sawtooth_timer_on [label= "SW1"];
+    song4_sawtooth_timer_off -> song1_sawtooth_timer_off [label= "SW1"];
+    song4_square_timer_on -> song2_square_timer_on [label= "SW2"];
+    song4_square_timer_off -> song2_square_timer_off [label= "SW2"];
+    song4_sawtooth_timer_on -> song2_sawtooth_timer_on [label= "SW2"];
+    song4_sawtooth_timer_off -> song2_sawtooth_timer_off [label= "SW2"];
+    song4_square_timer_on -> song3_square_timer_on [label= "SW3"];
+    song4_square_timer_off -> song3_square_timer_off [label= "SW3"];
+    song4_sawtooth_timer_on -> song3_sawtooth_timer_on [label= "SW3"];
+    song4_sawtooth_timer_off -> song3_sawtooth_timer_off [label= "SW3"];
+    song4_square_timer_on -> song4_square_timer_on [label= "SW4"];
+    song4_square_timer_off -> song4_square_timer_off [label= "SW4"];
+    song4_sawtooth_timer_on -> song4_sawtooth_timer_on [label= "SW4"];
+    song4_sawtooth_timer_off -> song4_sawtooth_timer_off [label= "SW4"];
+    
+    // SW5, SW6
+    edge [color=red]
+    song1_square_timer_on -> song1_square_timer_on [label= "SW7"];
+    song1_sawtooth_timer_on -> song1_sawtooth_timer_on [label= "SW7"];
+    song2_square_timer_on -> song2_square_timer_on [label= "SW7"];
+    song2_sawtooth_timer_on -> song2_sawtooth_timer_on [label= "SW7"];
+    song3_square_timer_on -> song3_square_timer_on [label= "SW7"];
+    song3_sawtooth_timer_on -> song3_sawtooth_timer_on [label= "SW7"];
+    song4_square_timer_on -> song4_square_timer_on [label= "SW7"];
+    song4_sawtooth_timer_on -> song4_sawtooth_timer_on [label= "SW7"];
+    song1_square_timer_off -> song1_square_timer_on [label= "SW7"];
+    song1_sawtooth_timer_off -> song1_sawtooth_timer_on [label= "SW7"];
+    song2_square_timer_off -> song2_square_timer_on [label= "SW7"];
+    song2_sawtooth_timer_off -> song2_sawtooth_timer_on [label= "SW7"];
+    song3_square_timer_off -> song3_square_timer_on [label= "SW7"];
+    song3_sawtooth_timer_off -> song3_sawtooth_timer_on [label= "SW7"];
+    song4_square_timer_off -> song4_square_timer_on [label= "SW7"];
+    song4_sawtooth_timer_off -> song4_sawtooth_timer_on [label= "SW7"];
+    song1_square_timer_on -> song1_square_timer_off [label= "SW8"];
+    song1_sawtooth_timer_on -> song1_sawtooth_timer_off [label= "SW8"];
+    song2_square_timer_on -> song2_square_timer_off [label= "SW8"];
+    song2_sawtooth_timer_on -> song2_sawtooth_timer_off [label= "SW8"];
+    song3_square_timer_on -> song3_square_timer_off [label= "SW8"];
+    song3_sawtooth_timer_on -> song3_sawtooth_timer_off [label= "SW8"];
+    song4_square_timer_on -> song4_square_timer_off [label= "SW8"];
+    song4_sawtooth_timer_on -> song4_sawtooth_timer_off [label= "SW8"];
+    song1_square_timer_off -> song1_square_timer_off [label= "SW8"];
+    song1_sawtooth_timer_off -> song1_sawtooth_timer_off [label= "SW8"];
+    song2_square_timer_off -> song2_square_timer_off [label= "SW8"];
+    song2_sawtooth_timer_off -> song2_sawtooth_timer_off [label= "SW8"];
+    song3_square_timer_off -> song3_square_timer_off [label= "SW8"];
+    song3_sawtooth_timer_off -> song3_sawtooth_timer_off [label= "SW8"];
+    song4_square_timer_off -> song4_square_timer_off [label= "SW8"];
+    song4_sawtooth_timer_off -> song4_sawtooth_timer_off [label= "SW8"];
+    
+    edge [color="#00aa00"]
+    song1_square_timer_on -> song1_sawtooth_timer_on [label= "SW5"];
+    song1_square_timer_off -> song1_sawtooth_timer_off [label= "SW5"];
+    song1_sawtooth_timer_on -> song1_sawtooth_timer_on [label= "SW5"];
+    song1_sawtooth_timer_off -> song1_sawtooth_timer_off [label= "SW5"];
+    song2_square_timer_on -> song2_sawtooth_timer_on [label= "SW5"];
+    song2_square_timer_off -> song2_sawtooth_timer_off [label= "SW5"];
+    song2_sawtooth_timer_on -> song2_sawtooth_timer_on [label= "SW5"];
+    song2_sawtooth_timer_off -> song2_sawtooth_timer_off [label= "SW5"];
+    song3_square_timer_on -> song3_sawtooth_timer_on [label= "SW5"];
+    song3_square_timer_off -> song3_sawtooth_timer_off [label= "SW5"];
+    song3_sawtooth_timer_on -> song3_sawtooth_timer_on [label= "SW5"];
+    song3_sawtooth_timer_off -> song3_sawtooth_timer_off [label= "SW5"];
+    song4_square_timer_on -> song4_sawtooth_timer_on [label= "SW5"];
+    song4_square_timer_off -> song4_sawtooth_timer_off [label= "SW5"];
+    song4_sawtooth_timer_on -> song4_sawtooth_timer_on [label= "SW5"];
+    song4_sawtooth_timer_off -> song4_sawtooth_timer_off [label= "SW5"];
+    song1_square_timer_on -> song1_square_timer_on [label= "SW6"];
+    song1_square_timer_off -> song1_square_timer_off [label= "SW6"];
+    song1_sawtooth_timer_on -> song1_square_timer_on [label= "SW6"];
+    song1_sawtooth_timer_off -> song1_square_timer_off [label= "SW6"];
+    song2_square_timer_on -> song2_square_timer_on [label= "SW6"];
+    song2_square_timer_off -> song2_square_timer_off [label= "SW6"];
+    song2_sawtooth_timer_on -> song2_square_timer_on [label= "SW6"];
+    song2_sawtooth_timer_off -> song2_square_timer_off [label= "SW6"];
+    song3_square_timer_on -> song3_square_timer_on [label= "SW6"];
+    song3_square_timer_off -> song3_square_timer_off [label= "SW6"];
+    song3_sawtooth_timer_on -> song3_square_timer_on [label= "SW6"];
+    song3_sawtooth_timer_off -> song3_square_timer_off [label= "SW6"];
+    song4_square_timer_on -> song4_square_timer_on [label= "SW6"];
+    song4_square_timer_off -> song4_square_timer_off [label= "SW6"];
+    song4_sawtooth_timer_on -> song4_square_timer_on [label= "SW6"];
+    song4_sawtooth_timer_off -> song4_square_timer_off [label= "SW6"];
+    
+    
+    
+    edge [color="#aaaaaa"]
+    
+
+
+}

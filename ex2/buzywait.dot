@@ -1,0 +1,20 @@
+digraph finite_state_machine {
+	rankdir=LR;
+	node [shape = doublecircle];
+	init;
+	node [shape = circle];
+	node [shape = ellipse];
+	busyWait;
+	stepSong;
+	handleButton;
+	
+	init -> busyWait [label = "do setup"];
+	
+	busyWait -> busyWait [label = "@"];
+	busyWait -> handleButton [label = "~GPIO_PC_DIN != 0"];
+	busyWait -> stepSong [label = "TIMER1_CNT < 30"];
+	
+	edge [color="#888888"]
+	handleButton -> busyWait;
+	stepSong -> busyWait;
+}

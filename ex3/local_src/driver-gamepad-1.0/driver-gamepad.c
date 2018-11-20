@@ -35,11 +35,13 @@ struct fasync_struct* async_queue;
 MODULE_LICENSE("GPL");
 
 static ssize_t gamepad_read(struct file *filp, char __user *buff, size_t count, loff_t *offp) {
+  printk(KERN_INFO "Reading");
   return copy_to_user(buff, &buttons, sizeof(buttons)) ? -EFAULT : 0; // copies buttons to user. returns error (EFAULT) if it didn't read 
 }
 
 static int gamepad_fasync(int fd, struct file *filp, int mode) {
-  return fasync_helper(fd, filp, mode, async_queue); // registers a process to signal to
+  printk(KERN_INFO "\n%d , %d", fd, mode); // 3, 1 
+  return fasync_helper(fd, filp, mode, &async_queue); // registers a process to signal to
 }
 
 static int gamepad_release(struct inode *inode, struct file *filp)
@@ -66,11 +68,13 @@ irqreturn_t gamepad_interrupt(int irq, void* dev_id) {
   printk(KERN_INFO "interrupted");
   // tell GPIO we're handling the interrupt
   buttons = ioread32(IF);
-  iowrite32(buttons, IFC);
+  iowrite32(ioread32(IF), IFC);
 
   //send SIGIO to any process listening, if any exist
-  if (async_queue)
+  if (async_queue) {
+    printk(KERN_INFO "Sending interrupt");
     kill_fasync(&async_queue, SIGIO, POLL_IN); // POLL_IN means file can be read
+  }
   return IRQ_HANDLED;
 }
 

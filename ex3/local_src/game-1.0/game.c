@@ -4,20 +4,41 @@
 #include <signal.h>
 #include <fcntl.h>
 
+FILE* gamepad;
+int buttons;
+
 void receive_input(int signo) {
-  printf("game received interrupt");
+  fread(&buttons, sizeof(buttons), 1, gamepad);
+  printf("Buttons pressed: %d", buttons);
+  return;
 }
 
 int main(int argc, char *argv[]) {
-  printf("Hello world! -- game");
-  FILE* gamepad = fopen("/dev/gamepad", "rb");
-  if (gamepad != NULL) printf("found file");
-  // this part leads to an unhandled exception. dunno why lol
-  /*  printf("registering function returned signal %d", signal(SIGIO, &receive_input));
-  printf("registering ownership returned signal %d", fcntl(fileno(gamepad), F_SETOWN, getpid()));
-  int oflags = fcntl(fileno(gamepad), F_GETFL);
-  printf("oflags: %d", oflags);
-  printf("setting FL returned signal %d", fcntl(fileno(gamepad), F_SETFL, oflags | FASYNC));
-  while(1) {} // debug i hope */
-  exit(EXIT_SUCCESS);
+  gamepad = fopen("/dev/gamepad", "rb");
+  if (gamepad != NULL) {
+    printf("found file /dev/gamepad");
+  }
+  int fno = fileno(gamepad);
+  
+  //set up sigaction
+  struct sigaction action;
+  memset(&action, 0, sizeof(action));
+  action.sa_handler = receive_input; // set function to run when signal is received
+  action.sa_flags = 0; // no relevant flags
+  sigaction(SIGIO, &action, NULL); // run interrupt on SIGIO
+
+  // Set ownership of gamepad to this program.
+  if (fcntl(fno, F_SETOWN, getpid()) == -1) {
+    printf("Error in setting ownership of gamepad.");
+    return EXIT_FAILURE;
+  }
+  if (fcntl(fno, F_SETFL, fcntl(fno, F_GETFL) | FASYNC) == -1) {
+    printf("Error in setting FASYNC flag in gamepad.");
+    return EXIT_FAILURE;
+  }
+  while (1) {
+    printf("successss");
+    sleep(10000);
+  }
+  return EXIT_SUCCESS;
 }

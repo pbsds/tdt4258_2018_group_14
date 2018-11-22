@@ -35,12 +35,10 @@ struct fasync_struct* async_queue;
 MODULE_LICENSE("GPL");
 
 static ssize_t gamepad_read(struct file *filp, char __user *buff, size_t count, loff_t *offp) {
-  printk(KERN_INFO "Reading");
   return copy_to_user(buff, &buttons, sizeof(buttons)) ? -EFAULT : 0; // copies buttons to user. returns error (EFAULT) if it didn't read 
 }
 
 static int gamepad_fasync(int fd, struct file *filp, int mode) {
-  printk(KERN_INFO "\n%d , %d", fd, mode); // 3, 1 
   return fasync_helper(fd, filp, mode, &async_queue); // registers a process to signal to
 }
 
@@ -65,14 +63,12 @@ static const struct of_device_id of_gamepad_device_match[] = {
 MODULE_DEVICE_TABLE(of, of_gamepad_device_match);
 
 irqreturn_t gamepad_interrupt(int irq, void* dev_id) {
-  printk(KERN_INFO "interrupted");
   // tell GPIO we're handling the interrupt
   buttons = ioread32(IF);
-  iowrite32(ioread32(IF), IFC);
+  iowrite32(ioread32(IF)|ioread32(IFC), IFC);
 
   //send SIGIO to any process listening, if any exist
   if (async_queue) {
-    printk(KERN_INFO "Sending interrupt");
     kill_fasync(&async_queue, SIGIO, POLL_IN); // POLL_IN means file can be read
   }
   return IRQ_HANDLED;
@@ -80,7 +76,7 @@ irqreturn_t gamepad_interrupt(int irq, void* dev_id) {
 
 // init code
 static int gamepad_probe(struct platform_device *dev) {
-  printk(KERN_INFO "hello world");
+  printk(KERN_INFO "hello world\n");
   
   //assign major number to the gamepad, and allocate a chardev region to it.
   dev_t devno = MKDEV(0, 0); // the assignment to MKDEV isn't necessary, but if we don't, the compiler gives some very ornery warnings
@@ -94,7 +90,7 @@ static int gamepad_probe(struct platform_device *dev) {
   int err = cdev_add(&gamepad_cdev, devno, 1);
   /* Fail gracefully if need be */
   if (err) {
-    printk(KERN_NOTICE "Error %d adding gamepad", err);
+    printk(KERN_NOTICE "Error %d adding gamepad\n", err);
     return err;
   }
 
@@ -134,10 +130,10 @@ static int gamepad_probe(struct platform_device *dev) {
   // request IRQ so the kernel handles interrupts for us
   // we use can_request_irq to be as safe as possible (NOTE: seems to not be exported to modules???)
   if (request_irq(17, gamepad_interrupt, 0, "gamepad", NULL)) {
-    printk(KERN_INFO "Can't be assigned IRQ 17");
+    printk(KERN_INFO "Can't be assigned IRQ 17\n");
   }
   if (request_irq(18, gamepad_interrupt, 0, "gamepad", NULL)) {
-    printk(KERN_INFO "Can't be assigned IRQ 18");
+    printk(KERN_INFO "Can't be assigned IRQ 18\n");
   }
 
   //enable interrupt generators
@@ -151,7 +147,7 @@ static int gamepad_probe(struct platform_device *dev) {
   // clear interrupt flags
   iowrite32(ioread32(IF), IFC);
 
-  printk(KERN_INFO "Successfully initialised gamepad with major %d", gamepad_major);
+  printk(KERN_INFO "Successfully initialised gamepad with major %d\n", gamepad_major);
   return 0;
 }
 

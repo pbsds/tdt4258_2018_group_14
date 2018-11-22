@@ -100,18 +100,45 @@ static int gamepad_probe(struct platform_device *dev) {
   cl = class_create(THIS_MODULE, "gamepad");
   device_create(cl, NULL, devno, NULL, "gamepad");
 
-  // TODO: error check this. it returns a non-NULL pointer if it's all good
   // requests memory regions with corresponding sizes
   // all of these have 4-byte offsets, but some are only defined for 2 bytes
-  request_mem_region(GPIO_PC_MODEL, 4, "gamepad");
-  request_mem_region(GPIO_PC_DOUT, 2, "gamepad");
-  request_mem_region(GPIO_PC_DIN, 2, "gamepad");
-  request_mem_region(GPIO_EXTIPSELL, 4, "gamepad");
-  request_mem_region(GPIO_EXTIFALL, 2, "gamepad");
-  request_mem_region(GPIO_IEN, 2, "gamepad");
-  request_mem_region(ISER0, 4, "gamepad");
-  request_mem_region(GPIO_IF, 2, "gamepad");
-  request_mem_region(GPIO_IFC, 2, "gamepad");
+  // NULL returns mean the request failed, possibly because it's in use
+  if(request_mem_region(GPIO_PC_MODEL, 4, "gamepad") == NULL){
+    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_PC_MODEL);
+    return 1;
+  }
+  if(request_mem_region(GPIO_PC_DOUT, 2, "gamepad") == NULL){
+    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_PC_DOUT);
+    return 1;
+  }
+  if(request_mem_region(GPIO_PC_DIN, 2, "gamepad") == NULL){
+    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_PC_DIN);
+    return 1;
+  }
+  if(request_mem_region(GPIO_EXTIPSELL, 4, "gamepad") == NULL){
+    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_EXTIPSELL);
+    return 1;
+  }
+  if(request_mem_region(GPIO_EXTIFALL, 2, "gamepad") == NULL){
+    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_EXTIFALL);
+    return 1;
+  }
+  if(request_mem_region(GPIO_IEN, 2, "gamepad") == NULL){
+    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_IEN);
+    return 1;
+  }
+  if(request_mem_region(ISER0, 4, "gamepad") == NULL){
+    printk(KERN_NOTICE "Error reserving memory region starting at %d", ISER0);
+    return 1;
+  }
+  if(request_mem_region(GPIO_IF, 2, "gamepad") == NULL){
+    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_IF);
+    return 1;
+  }
+  if(request_mem_region(GPIO_IFC, 2, "gamepad") == NULL){
+    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_IFC);
+    return 1;
+  }
 
   // map physical address space to virtual memory
   MODEL = ioremap_nocache(GPIO_PC_MODEL, 4);

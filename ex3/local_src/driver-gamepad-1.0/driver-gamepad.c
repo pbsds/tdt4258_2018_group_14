@@ -100,56 +100,59 @@ static int gamepad_probe(struct platform_device *dev) {
   cl = class_create(THIS_MODULE, "gamepad");
   device_create(cl, NULL, devno, NULL, "gamepad");
 
+  struct resource *GPIO = platform_get_resource(dev, IORESOURCE_MEM, 0);
+  uint32_t GPIO_BASE = (uint32_t)(GPIO->start);
+
   // requests memory regions with corresponding sizes
   // all of these have 4-byte offsets, but some are only defined for 2 bytes
   // NULL returns mean the request failed, possibly because it's in use
-  if(request_mem_region(GPIO_PC_MODEL, 4, "gamepad") == NULL){
-    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_PC_MODEL);
+  if(request_mem_region((volatile uint32_t*)(GPIO_BASE + GPIO_PC_MODEL), 4, "gamepad") == NULL){
+    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_BASE + GPIO_PC_MODEL);
     return 1;
   }
-  if(request_mem_region(GPIO_PC_DOUT, 2, "gamepad") == NULL){
-    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_PC_DOUT);
+  if(request_mem_region((volatile uint32_t*)(GPIO_BASE + GPIO_PC_DOUT), 2, "gamepad") == NULL){
+    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_BASE + GPIO_PC_DOUT);
     return 1;
   }
-  if(request_mem_region(GPIO_PC_DIN, 2, "gamepad") == NULL){
-    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_PC_DIN);
+  if(request_mem_region((volatile uint32_t*)(GPIO_BASE + GPIO_PC_DIN), 2, "gamepad") == NULL){
+    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_BASE + GPIO_PC_DIN);
     return 1;
   }
-  if(request_mem_region(GPIO_EXTIPSELL, 4, "gamepad") == NULL){
-    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_EXTIPSELL);
+  if(request_mem_region((volatile uint32_t*)(GPIO_BASE + GPIO_EXTIPSELL), 4, "gamepad") == NULL){
+    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_BASE + GPIO_EXTIPSELL);
     return 1;
   }
-  if(request_mem_region(GPIO_EXTIFALL, 2, "gamepad") == NULL){
-    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_EXTIFALL);
+  if(request_mem_region((volatile uint32_t*)(GPIO_BASE + GPIO_EXTIFALL), 2, "gamepad") == NULL){
+    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_BASE + GPIO_EXTIFALL);
     return 1;
   }
-  if(request_mem_region(GPIO_IEN, 2, "gamepad") == NULL){
-    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_IEN);
+  if(request_mem_region((volatile uint32_t*)(GPIO_BASE + GPIO_IEN), 2, "gamepad") == NULL){
+    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_BASE + GPIO_IEN);
     return 1;
   }
   if(request_mem_region(ISER0, 4, "gamepad") == NULL){
     printk(KERN_NOTICE "Error reserving memory region starting at %d", ISER0);
     return 1;
   }
-  if(request_mem_region(GPIO_IF, 2, "gamepad") == NULL){
-    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_IF);
+  if(request_mem_region((volatile uint32_t*)(GPIO_BASE + GPIO_IF), 2, "gamepad") == NULL){
+    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_BASE + GPIO_IF);
     return 1;
   }
-  if(request_mem_region(GPIO_IFC, 2, "gamepad") == NULL){
-    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_IFC);
+  if(request_mem_region((volatile uint32_t*)(GPIO_BASE + GPIO_IFC), 2, "gamepad") == NULL){
+    printk(KERN_NOTICE "Error reserving memory region starting at %d", GPIO_BASE + GPIO_IFC);
     return 1;
   }
 
   // map physical address space to virtual memory
-  MODEL = ioremap_nocache(GPIO_PC_MODEL, 4);
-  DOUT = ioremap_nocache(GPIO_PC_DOUT, 2);
-  DIN = ioremap_nocache(GPIO_PC_DIN, 2);
-  EXTIPSELL = ioremap_nocache(GPIO_EXTIPSELL, 4);
-  EXTIFALL = ioremap_nocache(GPIO_EXTIFALL, 2);
-  IEN = ioremap_nocache(GPIO_IEN, 2);
+  MODEL = ioremap_nocache((volatile uint32_t*)(GPIO_BASE + GPIO_PC_MODEL), 4);
+  DOUT = ioremap_nocache((volatile uint32_t*)(GPIO_BASE + GPIO_PC_DOUT), 2);
+  DIN = ioremap_nocache((volatile uint32_t*)(GPIO_BASE + GPIO_PC_DIN), 2);
+  EXTIPSELL = ioremap_nocache((volatile uint32_t*)(GPIO_BASE + GPIO_EXTIPSELL), 4);
+  EXTIFALL = ioremap_nocache((volatile uint32_t*)(GPIO_BASE + GPIO_EXTIFALL), 2);
+  IEN = ioremap_nocache((volatile uint32_t*)(GPIO_BASE + GPIO_IEN), 2);
   _ISER0 = ioremap_nocache(ISER0, 4);
-  IF = ioremap_nocache(GPIO_IF, 2);
-  IFC = ioremap_nocache(GPIO_IFC, 2);
+  IF = ioremap_nocache((volatile uint32_t*)(GPIO_BASE + GPIO_IF), 2);
+  IFC = ioremap_nocache((volatile uint32_t*)(GPIO_BASE + GPIO_IFC), 2);
 
   iowrite32(0x33333333, MODEL); // read mode on buttons
   iowrite32(0x00ff, DOUT); // pull high
@@ -191,15 +194,18 @@ static int gamepad_remove(struct platform_device *dev) {
   iounmap(IF);
   iounmap(_ISER0);
 
+  struct resource *GPIO = platform_get_resource(dev, IORESOURCE_MEM, 0);
+  uint32_t GPIO_BASE = (uint32_t)(GPIO->start);
+
   // releases memory regions after we're done with them, not necessary but good practice
-  release_mem_region(GPIO_PC_MODEL, 4);
-  release_mem_region(GPIO_PC_DOUT, 2);
-  release_mem_region(GPIO_PC_DIN, 2);
-  release_mem_region(GPIO_EXTIPSELL, 4);
-  release_mem_region(GPIO_EXTIFALL, 2);
-  release_mem_region(GPIO_IEN, 2);
-  release_mem_region(GPIO_IFC, 2);
-  release_mem_region(GPIO_IF, 2);
+  release_mem_region((volatile uint32_t*)(GPIO_BASE + GPIO_PC_MODEL), 4);
+  release_mem_region((volatile uint32_t*)(GPIO_BASE + GPIO_PC_DOUT), 2);
+  release_mem_region((volatile uint32_t*)(GPIO_BASE + GPIO_PC_DIN), 2);
+  release_mem_region((volatile uint32_t*)(GPIO_BASE + GPIO_EXTIPSELL), 4);
+  release_mem_region((volatile uint32_t*)(GPIO_BASE + GPIO_EXTIFALL), 2);
+  release_mem_region((volatile uint32_t*)(GPIO_BASE + GPIO_IEN), 2);
+  release_mem_region((volatile uint32_t*)(GPIO_BASE + GPIO_IFC), 2);
+  release_mem_region((volatile uint32_t*)(GPIO_BASE + GPIO_IF), 2);
   release_mem_region(ISER0, 4);
   // free odd and even GPIO interrupts
   // assume platform_get_irq gives us the same results now as in init

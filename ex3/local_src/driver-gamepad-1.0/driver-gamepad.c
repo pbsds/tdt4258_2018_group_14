@@ -156,11 +156,11 @@ static int gamepad_probe(struct platform_device *dev) {
 
   // request IRQ so the kernel handles interrupts for us
   // we use can_request_irq to be as safe as possible (NOTE: seems to not be exported to modules???)
-  if (request_irq(17, gamepad_interrupt, 0, "gamepad", NULL)) {
-    printk(KERN_INFO "Can't be assigned IRQ 17\n");
+  if (request_irq(platform_get_irq(dev, 0), gamepad_interrupt, 0, "gamepad", NULL)) {
+    printk(KERN_INFO "Can't be assigned IRQ %d\n", platform_get_irq(dev, 0));
   }
-  if (request_irq(18, gamepad_interrupt, 0, "gamepad", NULL)) {
-    printk(KERN_INFO "Can't be assigned IRQ 18\n");
+  if (request_irq(platform_get_irq(dev, 1), gamepad_interrupt, 0, "gamepad", NULL)) {
+    printk(KERN_INFO "Can't be assigned IRQ %d\n", platform_get_irq(dev, 1));
   }
 
   //enable interrupt generators
@@ -202,8 +202,9 @@ static int gamepad_remove(struct platform_device *dev) {
   release_mem_region(GPIO_IF, 2);
   release_mem_region(ISER0, 4);
   // free odd and even GPIO interrupts
-  free_irq(17, NULL);
-  free_irq(18, NULL);
+  // assume platform_get_irq gives us the same results now as in init
+  free_irq(platform_get_irq(dev, 0), NULL);
+  free_irq(platform_get_irq(dev, 1), NULL);
 
   return 0;
 }

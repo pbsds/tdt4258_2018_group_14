@@ -44,7 +44,7 @@ void move_player(int c){
 	switch(c){
 		case 2: //UP (Player 1)
 			if(p_one_pos>=0){
-				if((p_one_pos-PADDLE_STEP)<0){
+				if(p_one_pos<PADDLE_STEP){
 					p_one_pos=0;
 				}
 				else{
@@ -54,7 +54,7 @@ void move_player(int c){
 			break;
 		case 32: //UP (Player 2)
 			if(p_two_pos>=0){
-				if((p_two_pos-PADDLE_STEP)<0){
+				if(p_two_pos<PADDLE_STEP){
 					p_two_pos=0;
 				}
 				else{

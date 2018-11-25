@@ -8,5 +8,5 @@ The target platform in is the EFM32GG (DK37507) board.
 * pbsds
 * sm0xe
 * RandomGamer342
-* birksolbjorg
+* rikkesolbjorg
 * Oracien

@@ -1,0 +1,16 @@
+digraph fsm {
+	rankdir=LR;
+	
+	node[shape = ellipse peripheries=2];
+	draw_ball
+
+	node[shape = ellipse peripheries=1];
+
+	remove_ball  -> draw_board [label="step"]
+	draw_board   -> draw_paddles
+	draw_paddles -> draw_ball
+	draw_ball
+
+	edge [color = "#888888" fontcolor="#888888"]
+	
+}

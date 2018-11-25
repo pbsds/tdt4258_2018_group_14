@@ -1,0 +1,14 @@
+digraph fsm {
+	rankdir=LR;
+
+	node [shape = doublecircle];
+	S0;
+	node [shape = ellipse];
+	
+	S0->waiting [label="Do setup"]
+	
+	waiting->queried [label="Button query"]
+	queried->waiting [label="Return button state"]
+	
+	edge [color = "#888888"]
+}

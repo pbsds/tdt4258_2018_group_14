@@ -1,0 +1,31 @@
+digraph fsm {
+//	rankdir=LR;
+
+	node [shape = doublecircle];
+	S0;
+	node [shape = ellipse];
+	S0 -> reset [label="do setup"]
+	
+	
+	reset->get_player_input
+	get_player_input->advance_paddles
+	advance_paddles->advance_ball
+	advance_ball->check_wall_collision
+	
+	check_wall_collision->update_ball [label="yes"]
+	check_wall_collision->check_paddle_collision [label="no"]
+	check_paddle_collision->check_scoring_zone_collision [label="no"]
+	check_paddle_collision->update_ball [label="yes"]
+	
+	check_scoring_zone_collision->get_player_input [label="no"]
+	check_scoring_zone_collision->score_player_2 [label="left"]
+	check_scoring_zone_collision->score_player_1 [label="right"]
+	
+	
+	update_ball->get_player_input
+	score_player_2->reset
+	score_player_1->reset
+	
+	edge [color = "#888888" fontcolor="#888888"]
+	
+}

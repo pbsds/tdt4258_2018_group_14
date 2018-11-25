@@ -43,43 +43,35 @@ void clear_screen(){
 void move_player(int c){
 	switch(c){
 		case 2: //UP (Player 1)
-			if(p_one_pos>=0){
-				if(p_one_pos<PADDLE_STEP){
-					p_one_pos=0;
-				}
-				else{
-					p_one_pos-=PADDLE_STEP;
-				}
+			if(p_one_pos<PADDLE_STEP){
+				p_one_pos=0;
+			}
+			else{
+				p_one_pos-=PADDLE_STEP;
 			}
 			break;
 		case 32: //UP (Player 2)
-			if(p_two_pos>=0){
-				if(p_two_pos<PADDLE_STEP){
-					p_two_pos=0;
-				}
-				else{
-					p_two_pos-=PADDLE_STEP;
-				}
+			if(p_two_pos<PADDLE_STEP){
+				p_two_pos=0;
+			}
+			else{
+				p_two_pos-=PADDLE_STEP;
 			}
 			break;
 		case 8: //DOWN (Player 1)
-			if((p_one_pos+PADDLE_LEN)<HEIGHT){
-				if((p_one_pos+PADDLE_STEP)>(HEIGHT-PADDLE_LEN)){
-					p_one_pos=HEIGHT-PADDLE_LEN;
-				}
-				else{
-					p_one_pos+=PADDLE_STEP;
-				}
+			if((p_one_pos+PADDLE_STEP)>(HEIGHT-PADDLE_LEN)){
+				p_one_pos=HEIGHT-PADDLE_LEN;
+			}
+			else{
+				p_one_pos+=PADDLE_STEP;
 			}
 			break;
 		case 128: //DOWN (Player 2)
-			if((p_two_pos+PADDLE_LEN)<HEIGHT){
-				if((p_two_pos+PADDLE_STEP)>(HEIGHT-PADDLE_LEN)){
-					p_two_pos=HEIGHT-PADDLE_LEN;
-				}
-				else{
-					p_two_pos+=PADDLE_STEP;
-				}
+			if((p_two_pos+PADDLE_STEP)>(HEIGHT-PADDLE_LEN)){
+				p_two_pos=HEIGHT-PADDLE_LEN;
+			}
+			else{
+				p_two_pos+=PADDLE_STEP;
 			}
 			break;
 		default:

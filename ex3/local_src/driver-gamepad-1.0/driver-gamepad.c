@@ -27,7 +27,7 @@ scull example driver found in LDD (3rd edition)
 struct cdev gamepad_cdev;
 
 static int gamepad_major = 0;
-static uint32_t *MODEL, *DIN, *DOUT, *IF, *IFC, *EXTIPSELL, *EXTIFALL, *_ISER0, *IEN; // virtual memory addresses
+static uint32_t *MODEL, *DIN, *DOUT, *IF, *IFC, *EXTIPSELL, *EXTIFALL, *IEN; // virtual memory addresses
 static uint32_t buttons = 0;
 struct fasync_struct* async_queue;
 
@@ -135,10 +135,6 @@ static int gamepad_probe(struct platform_device *dev) {
     printk(KERN_NOTICE "Error reserving memory region starting at %p", (volatile uint32_t*)(GPIO_BASE + GPIO_IEN));
     return 1;
   }
-  if(request_mem_region((volatile resource_size_t)(ISER0), 4, "gamepad") == NULL){
-    printk(KERN_NOTICE "Error reserving memory region starting at %p", ISER0);
-    return 1;
-  }
   if(request_mem_region((volatile resource_size_t)(GPIO_BASE + GPIO_IF), 2, "gamepad") == NULL){
     printk(KERN_NOTICE "Error reserving memory region starting at %p", (volatile uint32_t*)(GPIO_BASE + GPIO_IF));
     return 1;
@@ -155,7 +151,6 @@ static int gamepad_probe(struct platform_device *dev) {
   EXTIPSELL = (uint32_t*)(ioremap_nocache((phys_addr_t)(GPIO_BASE + GPIO_EXTIPSELL), 4));
   EXTIFALL = (uint32_t*)(ioremap_nocache((phys_addr_t)(GPIO_BASE + GPIO_EXTIFALL), 2));
   IEN = (uint32_t*)(ioremap_nocache((phys_addr_t)(GPIO_BASE + GPIO_IEN), 2));
-  _ISER0 = (uint32_t*)(ioremap_nocache((phys_addr_t)(ISER0), 4));
   IF = (uint32_t*)(ioremap_nocache((phys_addr_t)(GPIO_BASE + GPIO_IF), 2));
   IFC = (uint32_t*)(ioremap_nocache((phys_addr_t)(GPIO_BASE + GPIO_IFC), 2));
 
@@ -175,9 +170,6 @@ static int gamepad_probe(struct platform_device *dev) {
   iowrite32(0x22222222, EXTIPSELL); // set port C pin 0-7 as interrupt generators
   iowrite32(0xff, EXTIFALL);       // generate interrupts on 1->0 transitions
   iowrite32(0xff, IEN); // enable interrupt generation on port 0-7
-
-  //enable interrupt handlers
-  iowrite32(ioread32(_ISER0) | (0x1 << 11) | (0x1 << 1), _ISER0); // GPIO_ODD and GPIO_EVEN
 
   // clear interrupt flags
   iowrite32(ioread32(IF), IFC);
@@ -200,7 +192,6 @@ static int gamepad_remove(struct platform_device *dev) {
   iounmap(IEN);
   iounmap(IFC);
   iounmap(IF);
-  iounmap(_ISER0);
 
   GPIO = platform_get_resource(dev, IORESOURCE_MEM, 0);
   GPIO_BASE = (uint32_t)(GPIO->start);
@@ -214,7 +205,6 @@ static int gamepad_remove(struct platform_device *dev) {
   release_mem_region((volatile resource_size_t)(GPIO_BASE + GPIO_IEN), 2);
   release_mem_region((volatile resource_size_t)(GPIO_BASE + GPIO_IFC), 2);
   release_mem_region((volatile resource_size_t)(GPIO_BASE + GPIO_IF), 2);
-  release_mem_region((volatile resource_size_t)(ISER0), 4);
   // free odd and even GPIO interrupts
   // assume platform_get_irq gives us the same results now as in init
   free_irq(platform_get_irq(dev, 0), NULL);

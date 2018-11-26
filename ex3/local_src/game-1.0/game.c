@@ -126,11 +126,12 @@ void move_ball(){
 
 void draw_board(){
 	struct fb_copyarea area;
+	int i;
 	area.dx=WIDTH/2;
 	area.dy=0;
 	area.height = HEIGHT;
 	area.width = 1;
-	for(int i=0; i<HEIGHT; i++){ //The line in the middle of the board
+	for(i=0; i<HEIGHT; i++){ //The line in the middle of the board
 		screenBuffer[i*320+WIDTH/2]=0xffff;
 	}
 	ioctl(screenDriver, 0x4680, &area);
@@ -138,29 +139,30 @@ void draw_board(){
 
 void draw_paddles(){
 	struct fb_copyarea area;
+	int i, j;
 	area.dx=0;
 	area.dy=0;
 	area.height = HEIGHT;
 	area.width = PADDLE_WIDTH;
-	for(int i=0;i<HEIGHT;i++){ //Clear the left side
-		for(int j=0; j<PADDLE_WIDTH; j++){
+	for(i=0;i<HEIGHT;i++){ //Clear the left side
+		for(j=0; j<PADDLE_WIDTH; j++){
 			screenBuffer[i*WIDTH+j]=0x0000;
 		}
 	}
-	for(int i=0;i<PADDLE_LEN;i++){ //Draw the left paddle
-		for(int j=0; j<PADDLE_WIDTH; j++){
+	for(i=0;i<PADDLE_LEN;i++){ //Draw the left paddle
+		for(j=0; j<PADDLE_WIDTH; j++){
 			screenBuffer[(p_one_pos+i)*WIDTH+j]=0xf800;
 		}
 	}
 	ioctl(screenDriver, 0x4680, &area);
 	area.dx=WIDTH-PADDLE_WIDTH;
-	for(int i=0;i<HEIGHT;i++){ //Clear the right side
-		for(int j=0; j<PADDLE_WIDTH; j++){
+	for(i=0;i<HEIGHT;i++){ //Clear the right side
+		for(j=0; j<PADDLE_WIDTH; j++){
 			screenBuffer[i*WIDTH+WIDTH-j]=0x0000;
 		}
 	}
-	for(int i=0;i<PADDLE_LEN;i++){ //Draw the right paddle
-		for(int j=0; j<PADDLE_WIDTH; j++){
+	for(i=0;i<PADDLE_LEN;i++){ //Draw the right paddle
+		for(j=0; j<PADDLE_WIDTH; j++){
 			screenBuffer[(p_two_pos+i)*WIDTH+WIDTH-j]=0xffff;
 		}
 	}
@@ -169,12 +171,13 @@ void draw_paddles(){
 
 void remove_ball(){
 	struct fb_copyarea area;
+	int i, j;
 	area.dx=ball_x;
 	area.dy=ball_y;
 	area.height = BALL_SIZE;
 	area.width = BALL_SIZE;
-	for(int i=0;i<BALL_SIZE;i++){
-		for(int j=0;j<BALL_SIZE;j++){
+	for(i=0;i<BALL_SIZE;i++){
+		for(j=0;j<BALL_SIZE;j++){
 			screenBuffer[(ball_y+i)*320+ball_x+j]=0x0000;
 		}
 	}
@@ -182,12 +185,13 @@ void remove_ball(){
 }
 void draw_ball(){
 	struct fb_copyarea area;
+	int i, j;
 	area.dx=ball_x;
 	area.dy=ball_y;
 	area.height = BALL_SIZE;
 	area.width = BALL_SIZE;
-	for(int i=0;i<BALL_SIZE;i++){ //Draw ball
-		for(int j=0;j<BALL_SIZE;j++){
+	for(i=0;i<BALL_SIZE;i++){ //Draw ball
+		for(j=0;j<BALL_SIZE;j++){
 			screenBuffer[(ball_y+i)*320+ball_x+j]=0x04ff;
 		}
 	}

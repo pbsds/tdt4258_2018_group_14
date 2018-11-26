@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
-#include <signal.h>
 #include <asm-generic/fcntl.h>
+#include <signal.h>
 #include <linux/fb.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
@@ -121,12 +124,6 @@ void move_ball(){
 	ball_y += ball_y_dir; //Move ball one pixel in y-direction
 }
 
-void game_tick(){ //New game state, every tick
-	remove_ball();
-	move_ball();
-	draw_game();
-}
-
 void draw_board(){
 	struct fb_copyarea area;
 	area.dx=WIDTH/2;
@@ -203,9 +200,14 @@ void draw_game(){
 	draw_ball();
 }
 
+void game_tick(){ //New game state, every tick
+    remove_ball();
+    move_ball();
+    draw_game();
+}
 
 int receive_input(int signo) {
-	read(gamepad,&buttons,sizeof(buttons)); //Read which button was pressed
+	read((unsigned int)(gamepad),&buttons,sizeof(buttons)); //Read which button was pressed
 	move_player(buttons); //Move players based on button pressed
 	return 0;
 }
@@ -227,7 +229,7 @@ void init_graphics(){
 
 int main(int argc, char *argv[]) {
 	init_graphics();
-	gamepad = open("/dev/gamepad", O_RDONLY);
+	gamepad = (FILE*)open("/dev/gamepad", O_RDONLY);
 	int fno = fileno(fopen("/dev/gamepad", "r"));
 
 	//set up sigaction
